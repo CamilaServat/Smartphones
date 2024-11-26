@@ -13,6 +13,7 @@ class DatasetManipulation:
         self.df = pd.read_csv(csv_path, sep=';')  
         print("Dados carregados com sucesso.")
 
+        # Renomeando as colunas do DataFrame para tornar mais fácil o entendimento
         self.df.columns = [
             'marca', 'modelo', 'preco', 'avaliacao_media', '5G_disponivel', 'marca_processador',
             'num_nucleos', 'velocidade_processador', 'capacidade_bateria', 'carregamento_rapido_disponivel',
@@ -22,18 +23,19 @@ class DatasetManipulation:
         ]
 
         print("Primeiras linhas do dataset:")
-        print(self.df.head())
+        print(self.df.head())  
 
         print("\nInformacoes sobre o dataset:")
-        print(self.df.info())
+        print(self.df.info())  
 
         print("\nEstatisticas descritivas (apenas colunas numericas):")
-        print(self.df.describe())
+        print(self.df.describe())  
 
         print("\nValores nulos por coluna:")
-        print(self.df.isnull().sum())
+        print(self.df.isnull().sum())  
 
     def limpar_dados(self):
+        # Preenche os valores nulos nas colunas com a mediana ou moda
         self.df['avaliacao_media'] = self.df['avaliacao_media'].fillna(self.df['avaliacao_media'].median())
         self.df['marca_processador'] = self.df['marca_processador'].fillna(self.df['marca_processador'].mode()[0])
         self.df['num_nucleos'] = self.df['num_nucleos'].fillna(self.df['num_nucleos'].median())
@@ -47,32 +49,37 @@ class DatasetManipulation:
         print("Dados limpos com sucesso.")
 
     def transformar_dados(self):
-        self.df['preco'] = self.df['preco'] * 0.06
+        self.df['preco'] = self.df['preco'] * 0.06  
         self.df['preco'] = self.df['preco'].round(2)  
         print("Precos convertidos para reais e arredondados para 2 casas decimais.")
 
     def salvar_dados(self, path):
-        self.df.to_csv(path, index=False, sep=';')
+        self.df.to_csv(path, index=False, sep=';')  
         print(f"Dados salvos em {path}")
 
     def salvar_dados_mysql(self, host, user, password, database, table_name):
         try:
+            # Cria a conexão com o banco de dados MySQL usando SQLAlchemy
             engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
-            self.df.to_sql(table_name, con=engine, if_exists='replace', index=False)
+            self.df.to_sql(table_name, con=engine, if_exists='replace', index=False)  
             print(f"Dados salvos com sucesso na tabela '{table_name}' do banco de dados '{database}'.")
         except Exception as e:
-            print(f"Erro ao salvar dados no MySQL: {e}")
+            print(f"Erro ao salvar dados no MySQL: {e}")  
 
+# Caminho do arquivo CSV de entrada
 csv_path = r'c:\Users\Camila\Documents\Ciência dos Dados\Smartphones.csv'
 
 dataset = DatasetManipulation(csv_path)
 
 dataset.limpar_dados()
+
 dataset.transformar_dados()
 
+# Caminho de saída para o arquivo CSV transformado
 output_path = r'c:\Users\Camila\Documents\Ciência dos Dados\Smartphones_Transformado.csv'
 dataset.salvar_dados(output_path)
 
+# Configuração do banco de dados MySQL
 host = 'localhost'  
 user = 'root'       
 password = ''  
